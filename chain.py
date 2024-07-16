@@ -54,3 +54,4 @@ def invoke_chain(question):
 
 invoke_chain("환영해, 당황아! 난 기쁨이야!")
 invoke_chain("주먹 인사... 아니, 어... 그냥 하이파이브 하자. 손에 땀이 엄청 많구나.")
+invoke_chain("내 이름이 뭐라고?")
