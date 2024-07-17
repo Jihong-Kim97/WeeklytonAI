@@ -20,8 +20,10 @@ from langchain_huggingface import HuggingFaceEmbeddings
 
 os.environ["OPENAI_API_KEY"] = "-"
 
+# loader = DirectoryLoader(path='./RAG/', glob='*.txt')
 loader = TextLoader('rag.txt', encoding = 'UTF-8')
 data = loader.load()
+print(len(data[0].page_content))
 text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
     chunk_size=1000,
     chunk_overlap=200,
@@ -29,7 +31,7 @@ text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
 )
 
 documents = text_splitter.split_documents(data)
-# len(documents)
+len(documents)
 
 embeddings_model = HuggingFaceEmbeddings(
     model_name='jhgan/ko-sbert-nli',

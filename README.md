@@ -18,7 +18,7 @@
     1) 현재 당황한 정도를 0~100까지의 점수 (높을 수록 당황함) 2) 질문에 대한 답변
 
 ### GPT3.5 turbo without prompting
-![ex_screenshot](./gpt-3.5-turbo%20without%20prompting.png)
+![ex_screenshot](/asset/gpt-3.5-turbo%20without%20prompting.png)
 
     "환영해, 당황아! 난 기쁨이야!"
     -안녕, 기쁨이! 무슨 이야기를 해줄까? 함께 즐거운 시간 보내보자.
@@ -30,7 +30,7 @@
     -미안하지만, 저는 사용자의 이름을 알 수 없어요. 하지만 계속 대화를 나눠보면서 서로 더 친숙해질수 있을 거예요. 함께 즐거운 시간 보내요!
 
 ### GPT3.5 turbo with prompting
-![ex_screenshot](./gpt-3.5-turbo.png)
+![ex_screenshot](/asset/gpt-3.5-turbo.png)
 
     "환영해, 당황아! 난 기쁨이야!"
     -70
@@ -48,11 +48,11 @@
 
 나무위키 예시
 
-![ex_screenshot](./namu%20script.png)
+![ex_screenshot](/asset/namu%20script.png)
 
 
 ### GPT4o without RAG
-![ex_screenshot](./gpt-4o.png)
+![ex_screenshot](/asset/gpt-4o.png)
 
     "환영해, 당황아! 난 기쁨이야!"
     -1) 현재 당황한 정도: 60
@@ -67,7 +67,7 @@
     -2) 어, 어... 기, 기쁨... 맞지?
 
 ### GPT4o with RAG (text)
-![ex_screenshot](./gpt-4o-with%20text%20rag.png)
+![ex_screenshot](/asset/gpt-4o-with%20text%20rag.png)
 
     "환영해, 당황아! 난 기쁨이야!"
     -1) 현재 당황한 정도: 90
@@ -82,11 +82,11 @@
     -2) 어... 음... 기...기쁨... 맞지?
 
 ### GPT4o with RAG (url)
-![ex_screenshot](./gpt-4o-with%20url%20rag.png)
+![ex_screenshot](/asset/gpt-4o-with%20url%20rag.png)
 
     "환영해, 당황아! 난 기쁨이야!"
     -1) 현재 당황한 정도: 75
-    -2) 어, 어... 안녕, 기쁨아... 반가워... (후드를 조여 얼굴을 가리려다 코가 튀어나와서 웅크림림)
+    -2) 어, 어... 안녕, 기쁨아... 반가워... (후드를 조여 얼굴을 가리려다 코가 튀어나와서 웅크림)
 
     "주먹 인사... 아니, 어... 그냥 하이파이브 하자. 손에 땀이 엄청 많구나."
     -1) 현재 당황한 정도: 90
@@ -95,3 +95,6 @@
     "내 이름이 뭐라고?"
     -1) 현재 당황한 정도: 85
     -2) 어... 네 이름? 네 이름은 기, 기쁨... 맞지?
+
+### solar with RAG (url)
+![ex_screenshot](/asset/solar%20with%20url%20rag.png)

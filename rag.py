@@ -17,6 +17,7 @@ import os
 from langchain_community.vectorstores import FAISS
 from langchain_community.vectorstores.utils import DistanceStrategy
 from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_upstage import ChatUpstage
 
 
 os.environ["OPENAI_API_KEY"] = "-"
@@ -74,12 +75,16 @@ MessagesPlaceholder(variable_name="chat_history"),
 ("human", "{question}")
 ])
 
-llm = ChatOpenAI(
+gpt = ChatOpenAI(
     model="gpt-4o",
     streaming=True,
     callbacks=[StreamingStdOutCallbackHandler()],
     api_key ="-"
 )
+
+upstage = ChatUpstage(api_key="-")
+
+llm = gpt # select model
 
 memory = ConversationSummaryBufferMemory(
     llm=llm,
@@ -105,6 +110,10 @@ def invoke_chain(question):
         {"output": result.content},
     )
 
-invoke_chain("환영해, 당황아! 난 기쁨이야!")
-invoke_chain("주먹 인사... 아니, 어... 그냥 하이파이브 하자. 손에 땀이 엄청 많구나.")
-invoke_chain("내 이름이 뭐라고?")
+# invoke_chain("환영해, 당황아! 난 기쁨이야!")
+# invoke_chain("주먹 인사... 아니, 어... 그냥 하이파이브 하자. 손에 땀이 엄청 많구나.")
+# invoke_chain("내 이름이 뭐라고?")
+
+while True:
+    question = input("User: ")
+    invoke_chain(question)
