@@ -90,7 +90,7 @@ while True:
     )
  
     # Step 3: Output the Solar response chunks.
-    print("SOLAR: ", end="")
+        
     solar_response = ""
     for chunk in stream:
         response_content = chunk.choices[0].delta.content

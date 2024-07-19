@@ -19,9 +19,6 @@ from langchain_community.vectorstores.utils import DistanceStrategy
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_upstage import ChatUpstage
 
-
-os.environ["OPENAI_API_KEY"] = "-"
-
 url = "https://namu.wiki/w/%EB%8B%B9%ED%99%A9(%EC%9D%B8%EC%82%AC%EC%9D%B4%EB%93%9C%20%EC%95%84%EC%9B%83%20%EC%8B%9C%EB%A6%AC%EC%A6%88)"
 url2 ="https://namu.wiki/w/%EC%9D%B8%EC%82%AC%EC%9D%B4%EB%93%9C%20%EC%95%84%EC%9B%83%202/%EC%A4%84%EA%B1%B0%EB%A6%AC"
 
@@ -104,10 +101,17 @@ embarrassment_chain = {
 
 
 def invoke_chain(question):
-    result = embarrassment_chain.invoke(question)
+    # result = embarrassment_chain.invoke(question)
+    reponse = ""
+    for token in embarrassment_chain.stream(question):
+        response_content = token.content
+        if response_content is not None:
+            reponse += response_content
+            # print(response_content, end="")
+    print("\n")
     memory.save_context(
         {"input": question},
-        {"output": result.content},
+        {"output": reponse},
     )
 
 # invoke_chain("환영해, 당황아! 난 기쁨이야!")
@@ -116,4 +120,5 @@ def invoke_chain(question):
 
 while True:
     question = input("User: ")
+    print("GPT: ", end="")
     invoke_chain(question)

@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from chat import chat
+from b_chat_with_rag import chat
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
