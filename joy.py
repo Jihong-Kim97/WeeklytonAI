@@ -1,50 +1,9 @@
 from langchain.memory import ConversationSummaryBufferMemory
-from langchain_community.document_loaders import WebBaseLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.callbacks import StreamingStdOutCallbackHandler
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_openai import ChatOpenAI
 from langchain.schema.runnable import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
-import bs4
-from langchain_community.vectorstores import FAISS
-from langchain_community.vectorstores.utils import DistanceStrategy
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_upstage import ChatUpstage
-
-url = "https://namu.wiki/w/%EA%B8%B0%EC%81%A8(%EC%9D%B8%EC%82%AC%EC%9D%B4%EB%93%9C%20%EC%95%84%EC%9B%83%20%EC%8B%9C%EB%A6%AC%EC%A6%88)"
-url2 ="https://namu.wiki/w/%EC%9D%B8%EC%82%AC%EC%9D%B4%EB%93%9C%20%EC%95%84%EC%9B%83%202/%EC%A4%84%EA%B1%B0%EB%A6%AC"
-url3 = "https://namu.wiki/w/%EC%9D%B8%EC%82%AC%EC%9D%B4%EB%93%9C%20%EC%95%84%EC%9B%83/%EC%A4%84%EA%B1%B0%EB%A6%AC"
-
-webloader = WebBaseLoader(web_path = [url, url2, url3],
-                            bs_kwargs=dict(
-                                parse_only = bs4.SoupStrainer(
-                                    class_ = ("wiki-heading-content", "wiki-paragraph")
-                                )
-                            ))
-
-data = webloader.load()
-
-text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size = 500, 
-    chunk_overlap = 0
-)
-
-documents = text_splitter.split_documents(data)
-
-embeddings_model = HuggingFaceEmbeddings(
-    model_name='jhgan/ko-sbert-nli',
-    model_kwargs={'device':'cpu'},
-    encode_kwargs={'normalize_embeddings':True},
-)
-
-
-vectorstore = FAISS.from_documents(documents,
-                                   embedding = embeddings_model,
-                                   distance_strategy = DistanceStrategy.COSINE  
-                                  )
-
-retriever = vectorstore.as_retriever()
 
 embarrasssment_prompt = ChatPromptTemplate.from_messages([
     ("system", 
@@ -64,8 +23,6 @@ embarrasssment_prompt = ChatPromptTemplate.from_messages([
 상대방에게 사랑을 받는 것을 좋아합니다.
 모든 표현은 인위적이지 않고 자연스레 답변합니다.
 반복되는 표현은 지양합니다.
-또한 다음 정보를 참고하여 답변을 작성할 수 있습니다:\n\n{context}
-
 """),
 MessagesPlaceholder(variable_name="chat_history"),
 ("human", "{question}")
@@ -77,8 +34,6 @@ gpt = ChatOpenAI(
     callbacks=[StreamingStdOutCallbackHandler()],
     api_key ="-"
 )
-
-upstage = ChatUpstage(api_key="-")
 
 llm = gpt # select model
 
@@ -94,7 +49,6 @@ def load_memory(input):
     return memory.load_memory_variables({})["chat_history"]
 
 embarrassment_chain = {
-    "context": retriever,
     "question": RunnablePassthrough()
     }|RunnablePassthrough.assign(chat_history=load_memory) | embarrasssment_prompt | llm #| StrOutputParser()
 

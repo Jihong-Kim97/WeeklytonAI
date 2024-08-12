@@ -1,50 +1,10 @@
 from langchain.memory import ConversationSummaryBufferMemory
-from langchain_community.document_loaders import WebBaseLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.callbacks import StreamingStdOutCallbackHandler
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_openai import ChatOpenAI
 from langchain.schema.runnable import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
-import bs4
-from langchain_community.vectorstores import FAISS
-from langchain_community.vectorstores.utils import DistanceStrategy
-from langchain_huggingface import HuggingFaceEmbeddings
 import random
-
-url = "https://namu.wiki/w/%EB%B6%88%EC%95%88(%EC%9D%B8%EC%82%AC%EC%9D%B4%EB%93%9C%20%EC%95%84%EC%9B%83%20%EC%8B%9C%EB%A6%AC%EC%A6%88)"
-url2 ="https://namu.wiki/w/%EC%9D%B8%EC%82%AC%EC%9D%B4%EB%93%9C%20%EC%95%84%EC%9B%83%202/%EC%A4%84%EA%B1%B0%EB%A6%AC"
-url3 = "https://namu.wiki/w/%EC%9D%B8%EC%82%AC%EC%9D%B4%EB%93%9C%20%EC%95%84%EC%9B%83/%EC%A4%84%EA%B1%B0%EB%A6%AC"
-
-webloader = WebBaseLoader(web_path = [url, url2, url3],
-                            bs_kwargs=dict(
-                                parse_only = bs4.SoupStrainer(
-                                    class_ = ("wiki-heading-content", "wiki-paragraph")
-                                )
-                            ))
-
-data = webloader.load()
-
-text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size = 500, 
-    chunk_overlap = 0
-)
-
-documents = text_splitter.split_documents(data)
-
-embeddings_model = HuggingFaceEmbeddings(
-    model_name='jhgan/ko-sbert-nli',
-    model_kwargs={'device':'cpu'},
-    encode_kwargs={'normalize_embeddings':True},
-)
-
-
-vectorstore = FAISS.from_documents(documents,
-                                   embedding = embeddings_model,
-                                   distance_strategy = DistanceStrategy.COSINE  
-                                  )
-
-retriever = vectorstore.as_retriever()
 
 situation = [
     "중간고사 기간: 중간고사를 앞두고 스트레스를 많이 받고 있습니다. 평소 강의를 충실히 들었지만, 시험 범위가 넓고 어려워 보입니다. '이번 시험에서 좋은 점수를 받을 수 있을까?', '만약 성적이 나쁘면 학점을 망치게 될 텐데'라는 생각이 당신을 불안하게 만듭니다. 밤늦게까지 책을 붙들고 있지만, 점점 더 불안감이 커집니다.",
@@ -88,10 +48,7 @@ embarrasssment_prompt = ChatPromptTemplate.from_messages([
 반복되는 표현은 지양합니다.
 모든 답변의 형식은 다음으로 통일합니다.
 상대방의 진심어린 위로가 느껴지면 때론 편안해져 불안도가 낮아집니다.
-1) 현재 불안한 정도를 1부터 5까지의 불안도 (높을 수록 불안함) 2) 질문에 대한 답변
-또한 다음 정보를 참고하여 답변을 작성할 수 있습니다:\n\n{context}
-
-"""),
+1) 현재 불안한 정도를 1부터 5까지의 불안도 (높을 수록 불안함) 2) 질문에 대한 답변"""),
 MessagesPlaceholder(variable_name="chat_history"),
 ("human", "{question}")
 ])
@@ -118,7 +75,6 @@ def load_memory(input):
 
 
 embarrassment_chain = {
-    "context": retriever,
     "question": RunnablePassthrough()
     }|RunnablePassthrough.assign(chat_history=load_memory) | embarrasssment_prompt | llm #| StrOutputParser()
 
