@@ -1,23 +1,15 @@
 from langchain.memory import ConversationSummaryBufferMemory
-from langchain_community.document_loaders import DirectoryLoader
 from langchain_community.document_loaders import WebBaseLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import Chroma
-from langchain_openai import OpenAIEmbeddings
-from langchain.embeddings import CacheBackedEmbeddings
 from langchain.callbacks import StreamingStdOutCallbackHandler
-from langchain.storage import LocalFileStore
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_openai import ChatOpenAI
 from langchain.schema.runnable import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 import bs4
-from custom.output_parsers import HTMLOutputParser
-import os
 from langchain_community.vectorstores import FAISS
 from langchain_community.vectorstores.utils import DistanceStrategy
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_upstage import ChatUpstage
 import random
 
 url = "https://namu.wiki/w/%EB%B6%88%EC%95%88(%EC%9D%B8%EC%82%AC%EC%9D%B4%EB%93%9C%20%EC%95%84%EC%9B%83%20%EC%8B%9C%EB%A6%AC%EC%A6%88)"
@@ -110,8 +102,6 @@ gpt = ChatOpenAI(
     callbacks=[StreamingStdOutCallbackHandler()],
     api_key ="-"
 )
-
-upstage = ChatUpstage(api_key="-")
 
 llm = gpt # select model
 
