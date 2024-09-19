@@ -94,7 +94,8 @@ gpt = ChatOpenAI(
     model="gpt-4o",
     streaming=True,
     callbacks=[StreamingStdOutCallbackHandler()],
-    api_key ="-"
+    api_key ="-",
+    temperature = 0.7
 )
 
 llm = gpt # select model
