@@ -59,7 +59,7 @@ MessagesPlaceholder(variable_name="chat_history"),
 ])
 
 gpt = ChatOpenAI(
-    model="gpt-4o",
+    model="gpt-4o-mini",
     streaming=True,
     callbacks=[StreamingStdOutCallbackHandler()],
     api_key ="-"
