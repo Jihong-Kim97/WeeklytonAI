@@ -393,7 +393,7 @@ Example
 "잘 보고 따라하시면 쉬워요 이거"
 '''
 
-black_image_url = 'https://i.ibb.co/NrZX1dj/2022040414050315369-1649048703.jpg'
+black_image_url = 'https://firebasestorage.googleapis.com/v0/b/characterai-63929.appspot.com/o/chefAn%2Fsome-image.jpg?alt=media&token=9fdfe6dd-2afe-48d7-bef6-fff298dac172.'
 white_image_url = 'https://i.ibb.co/5LT64j0/pasta.jpg'
 
 ahn_prompt = ChatPromptTemplate.from_messages([
