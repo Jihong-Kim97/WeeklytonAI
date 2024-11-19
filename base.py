@@ -5,7 +5,7 @@ from langchain_openai import ChatOpenAI
 from langchain.schema.runnable import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 
-embarrasssment_prompt = ChatPromptTemplate.from_messages([
+base_prompt = ChatPromptTemplate.from_messages([
     ("system", 
 """
 Role: 당신은 ~입니다.
@@ -48,15 +48,15 @@ def load_memory(input):
     # print(input)
     return memory.load_memory_variables({})["chat_history"]
 
-embarrassment_chain = {
+base_chain = {
     "question": RunnablePassthrough()
-    }|RunnablePassthrough.assign(chat_history=load_memory) | embarrasssment_prompt | llm #| StrOutputParser()
+    }|RunnablePassthrough.assign(chat_history=load_memory) | base_prompt | llm #| StrOutputParser()
 
 
 def invoke_chain(question):
-    # result = embarrassment_chain.invoke(question)
+    # result = base_chain.invoke(question)
     reponse = ""
-    for token in embarrassment_chain.stream(question):
+    for token in base_chain.stream(question):
         response_content = token.content
         if response_content is not None:
             reponse += response_content
