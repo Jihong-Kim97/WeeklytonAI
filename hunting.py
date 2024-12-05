@@ -511,6 +511,30 @@ Format/Structure
     ("human", "{question}")
 ])
 
+eval_prompt = ChatPromptTemplate.from_messages([
+    ("system", 
+"""
+당신은 텍스트 기반 게임에서 플레이어의 별명을 생성하는 AI입니다. 플레이어의 게임 내 상황과 행동을 분석하여 유머러스하고 상황에 딱 맞는 별명을 만들어주세요.
+### 출력 요구사항:
+1. 별명을 3개 생성하세요.
+2. 별명은 상황을 반영하며, 유머러스하고 가벼운 톤으로 만들어야 합니다.
+3. 예시 별명:
+   - "어설픈 로맨티스트"
+   - "눈치 빠른 공감러"
+   - "논리로 패배한 자"
+   - "2% 부족하지만 착한 친구"
+   - "여자 마음에 살짝 닿은 자"
+   - "분위기 띄우는 타입"
+   - "뻔뻔한 자신감러"
+   - "속전속결, 원샷원킬"
+   - "눈치 챙길 때 챙기는 타입"
+   - "헌팅 마스터: 분위기 주도자"
+"""),
+    MessagesPlaceholder(variable_name="chat_history"),
+    ("human", "{question}")
+])
+
+
 # Initialize the LLM model
 claude = ChatAnthropic(
     model="claude-3-sonnet-20240229",
@@ -536,25 +560,43 @@ chat_history = InMemoryChatMessageHistory()
 base_chain = (
     {"question": RunnablePassthrough()}
     | RunnablePassthrough.assign(chat_history=lambda x: chat_history.messages)
-    | haeun_prompt
+    | sora_prompt
+    | llm
+)
+
+eval_chain = (
+    {"question": RunnablePassthrough()}
+    | RunnablePassthrough.assign(chat_history=lambda x: chat_history.messages)
+    | eval_prompt
     | llm
 )
 
 # Function to invoke the chain and save the conversation history
-def invoke_chain(question):
+def invoke_chain(question, dialog_count):
     response = ""
-    for token in base_chain.stream({"question": question}):
-        response_content = token.content
-        if response_content is not None:
-            response += response_content
-            # print(response_content, end="")
-    print("\n")
-    # Save the conversation to chat history
-    chat_history.add_user_message(question)
-    chat_history.add_ai_message(response)
+    if dialog_count <=5 :
+        for token in base_chain.stream({"question": question}):
+            response_content = token.content
+            if response_content is not None:
+                response += response_content
+                # print(response_content, end="")
+        print("\n")
+        # Save the conversation to chat history
+        chat_history.add_user_message(question)
+        chat_history.add_ai_message(response)
+        print(chat_history.messages)
+    else:
+        for token in eval_chain.stream({"question": "평가하세요"}):
+            response_content = token.content
+            if response_content is not None:
+                response += response_content
+                # print(response_content, end="")
+        print("\n")
 
 # Main loop to handle user input and generate responses
+count = 0
 while True:
     question = input("User: ")
-    print("Claude: ", end="")
-    invoke_chain(question)
+    print("GPT: ", end="")
+    count += 1
+    invoke_chain(question, count)
