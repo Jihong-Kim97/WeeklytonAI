@@ -1,10 +1,11 @@
-from langchain.memory import ConversationSummaryBufferMemory
 from langchain.callbacks import StreamingStdOutCallbackHandler
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_anthropic import ChatAnthropic
 from langchain_openai import ChatOpenAI
 from langchain.schema.runnable import RunnablePassthrough
-from langchain_core.output_parsers import StrOutputParser
+from langchain_core.chat_history import InMemoryChatMessageHistory
 
+# Define the base prompt with a placeholder for chat history
 base_prompt = ChatPromptTemplate.from_messages([
     ("system", 
 """
@@ -28,45 +29,50 @@ MessagesPlaceholder(variable_name="chat_history"),
 ("human", "{question}")
 ])
 
+# Initialize the LLM model
+claude = ChatAnthropic(
+    model="claude-3-sonnet-20240229",
+    streaming=True,
+    callbacks=[StreamingStdOutCallbackHandler()],
+    api_key="-",
+)
+
 gpt = ChatOpenAI(
     model="gpt-4o",
     streaming=True,
     callbacks=[StreamingStdOutCallbackHandler()],
-    api_key ="-"
+    api_key ="-",
+    temperature = 0.7
 )
 
-llm = gpt # select model
+llm = gpt  # Select model
 
-memory = ConversationSummaryBufferMemory(
-    llm=llm,
-    max_token_limit=80,
-    memory_key="chat_history",
-    return_messages=True,
+# Set up memory to store past conversation history
+chat_history = InMemoryChatMessageHistory()
+
+# Define the base chain with memory integration
+base_chain = (
+    {"question": RunnablePassthrough()}
+    | RunnablePassthrough.assign(chat_history=lambda x: chat_history.messages)
+    | base_prompt
+    | llm
 )
 
-def load_memory(input):
-    # print(input)
-    return memory.load_memory_variables({})["chat_history"]
-
-base_chain = {
-    "question": RunnablePassthrough()
-    }|RunnablePassthrough.assign(chat_history=load_memory) | base_prompt | llm #| StrOutputParser()
-
-
+# Function to invoke the chain and save the conversation history
 def invoke_chain(question):
     # result = base_chain.invoke(question)
-    reponse = ""
+    response = ""
     for token in base_chain.stream(question):
         response_content = token.content
         if response_content is not None:
-            reponse += response_content
+            response += response_content
             # print(response_content, end="")
     print("\n")
-    memory.save_context(
-        {"input": question},
-        {"output": reponse},
-    )
+    chat_history.add_user_message(question)
+    chat_history.add_ai_message(response)
+        
 
+# Main loop to handle user input and generate responses
 while True:
     question = input("User: ")
     print("GPT: ", end="")
